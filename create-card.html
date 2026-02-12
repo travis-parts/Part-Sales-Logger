@@ -222,6 +222,12 @@
   <script>
     var t = TrelloPowerUp.iframe();
     var API_KEY = '57c447d193fc650177b14923e1ba4daf';
+    var USER_TOKEN = 'ATTA0f6ea16dcb511f7e1b9043ff00930dabe4b757b957a7246d114519846c70568f45DD8295';
+    
+    // Hide authorization UI since we have the token
+    document.getElementById('authNotice').style.display = 'none';
+    document.getElementById('authorizeBtn').style.display = 'none';
+    document.getElementById('successNotice').style.display = 'block';
     
     function addChecklistItem() {
       var container = document.getElementById('checklistItems');
@@ -338,19 +344,13 @@
       submitBtn.disabled = true;
       submitBtn.textContent = 'Creating...';
       
-      // Get stored token
-      t.get('member', 'private', 'token').then(function(token) {
-        if (!token) {
-          alert('Please authorize the Power-Up first by clicking "Authorize Power-Up" button.');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Create Card';
-          return;
-        }
-        
-        // Get board ID
-        return t.board('id').then(function(board) {
-          // Fetch all lists
-          return fetch('https://api.trello.com/1/boards/' + board.id + '/lists?key=' + API_KEY + '&token=' + token)
+      // Use hardcoded token
+      var token = USER_TOKEN;
+      
+      // Get board ID
+      t.board('id').then(function(board) {
+        // Fetch all lists
+        return fetch('https://api.trello.com/1/boards/' + board.id + '/lists?key=' + API_KEY + '&token=' + token)
             .then(function(response) {
               return response.json();
             })
