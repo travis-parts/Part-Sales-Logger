@@ -177,6 +177,21 @@
     var t = TrelloPowerUp.iframe();
     var Promise = TrelloPowerUp.Promise;
     
+    // Check authorization on load
+    t.getRestApi().then(function(restApi) {
+      return restApi.isAuthorized();
+    }).then(function(authorized) {
+      if (!authorized) {
+        // Show authorization message
+        alert('This Power-Up needs authorization to create cards. Please click "Authorize" when prompted.');
+        t.getRestApi().then(function(restApi) {
+          return restApi.authorize({ scope: 'read,write' });
+        }).catch(function(error) {
+          console.error('Authorization error:', error);
+        });
+      }
+    });
+    
     function addChecklistItem() {
       var container = document.getElementById('checklistItems');
       var newItem = document.createElement('div');
