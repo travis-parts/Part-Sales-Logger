@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+  <script>
+    var ICON_URL = 'https://cdn-icons-png.flaticon.com/512/3176/3176369.png';
+
+    TrelloPowerUp.initialize({
+      'board-buttons': function(t, options) {
+        return [{
+          icon: {
+            dark: ICON_URL,
+            light: ICON_URL
+          },
+          text: 'New Parts Order',
+          callback: function(t) {
+            return t.popup({
+              title: 'Create Parts Order Card',
+              url: 'https://travis-parts.github.io/Part-Sales-Logger/create-card.html',
+              height: 550
+            });
+          }
+        }];
+      }
+    });
+  </script>
+</body>
+</html>
