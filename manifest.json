@@ -1,0 +1,13 @@
+{
+  "name": "Parts Sales Logger",
+  "details": "Quick card creation for parts sales tracking",
+  "icon": {
+    "url": "./icon.svg"
+  },
+  "author": "Your Dealership",
+  "capabilities": [
+    "board-buttons"
+  ],
+  "connectorName": "Parts Sales Logger",
+  "tags": ["sales", "parts", "tracking"]
+}

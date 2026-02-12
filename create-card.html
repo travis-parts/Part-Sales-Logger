@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+      padding: 15px;
+      margin: 0;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      font-size: 13px;
+      color: #42526e;
+    }
+    
+    label .required {
+      color: #eb5a46;
+    }
+    
+    label .optional {
+      color: #6b778c;
+      font-weight: 400;
+      font-style: italic;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 2px solid #dfe1e6;
+      border-radius: 3px;
+      font-size: 14px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #0079bf;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    
+    .checklist-items {
+      margin-bottom: 10px;
+    }
+    
+    .checklist-item {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+    
+    .checklist-item input {
+      flex: 1;
+    }
+    
+    .btn-remove {
+      padding: 8px 12px;
+      background: #eb5a46;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-remove:hover {
+      background: #cf513d;
+    }
+    
+    .btn-add {
+      padding: 8px 12px;
+      background: #61bd4f;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 13px;
+      margin-bottom: 15px;
+    }
+    
+    .btn-add:hover {
+      background: #5aac44;
+    }
+    
+    .btn-primary {
+      width: 100%;
+      padding: 10px;
+      background: #0079bf;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    
+    .btn-primary:hover {
+      background: #026aa7;
+    }
+    
+    .btn-primary:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    
+    .error {
+      color: #eb5a46;
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <form id="cardForm">
+    <div class="form-group">
+      <label>Customer Name <span class="required">*</span></label>
+      <input type="text" id="customerName" required placeholder="Enter customer name">
+      <div class="error" id="customerNameError">Customer name is required</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Equipment <span class="required">*</span></label>
+      <input type="text" id="equipment" required placeholder="e.g., John Deere 5075E">
+      <div class="error" id="equipmentError">Equipment is required</div>
+    </div>
+    
+    <div class="form-group">
+      <label>Phone Number <span class="optional">(optional)</span></label>
+      <input type="tel" id="phone" placeholder="e.g., (555) 123-4567">
+    </div>
+    
+    <div class="form-group">
+      <label>Email Address <span class="optional">(optional)</span></label>
+      <input type="email" id="email" placeholder="e.g., customer@email.com">
+    </div>
+    
+    <div class="form-group">
+      <label>Address <span class="optional">(optional)</span></label>
+      <textarea id="address" placeholder="Enter customer address"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>Parts Needed <span class="optional">(optional)</span></label>
+      <div class="checklist-items" id="checklistItems">
+        <div class="checklist-item">
+          <input type="text" placeholder="Part # or description - Qty" class="part-item">
+          <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
+        </div>
+      </div>
+      <button type="button" class="btn-add" onclick="addChecklistItem()">+ Add Part</button>
+    </div>
+    
+    <div class="form-group">
+      <label>Comments <span class="optional">(optional)</span></label>
+      <textarea id="comments" placeholder="Any additional notes or comments"></textarea>
+    </div>
+    
+    <button type="submit" class="btn-primary" id="submitBtn">Create Card</button>
+  </form>
+
+  <script>
+    var t = TrelloPowerUp.iframe();
+    var Promise = TrelloPowerUp.Promise;
+    
+    function addChecklistItem() {
+      var container = document.getElementById('checklistItems');
+      var newItem = document.createElement('div');
+      newItem.className = 'checklist-item';
+      newItem.innerHTML = `
+        <input type="text" placeholder="Part # or description - Qty" class="part-item">
+        <button type="button" class="btn-remove" onclick="removeItem(this)">✕</button>
+      `;
+      container.appendChild(newItem);
+    }
+    
+    function removeItem(button) {
+      var items = document.querySelectorAll('.checklist-item');
+      if (items.length > 1) {
+        button.parentElement.remove();
+      }
+    }
+    
+    document.getElementById('cardForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      var customerName = document.getElementById('customerName').value.trim();
+      var equipment = document.getElementById('equipment').value.trim();
+      var phone = document.getElementById('phone').value.trim();
+      var email = document.getElementById('email').value.trim();
+      var address = document.getElementById('address').value.trim();
+      var comments = document.getElementById('comments').value.trim();
+      
+      // Validation
+      var isValid = true;
+      if (!customerName) {
+        document.getElementById('customerNameError').style.display = 'block';
+        isValid = false;
+      } else {
+        document.getElementById('customerNameError').style.display = 'none';
+      }
+      
+      if (!equipment) {
+        document.getElementById('equipmentError').style.display = 'block';
+        isValid = false;
+      } else {
+        document.getElementById('equipmentError').style.display = 'none';
+      }
+      
+      if (!isValid) return;
+      
+      // Get checklist items
+      var partItems = Array.from(document.querySelectorAll('.part-item'))
+        .map(input => input.value.trim())
+        .filter(value => value !== '');
+      
+      // Build card description
+      var description = '';
+      if (phone) description += '**Phone:** ' + phone + '\n';
+      if (email) description += '**Email:** ' + email + '\n';
+      if (address) description += '**Address:** ' + address + '\n';
+      
+      // Create card name
+      var cardName = customerName + ', ' + equipment;
+      
+      // Disable button
+      var submitBtn = document.getElementById('submitBtn');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating...';
+      
+      // Get the current list
+      t.list('id')
+        .then(function(list) {
+          // Create the card using Trello's REST API
+          return t.getRestApi().then(function(restApi) {
+            return restApi.isAuthorized().then(function(authorized) {
+              if (!authorized) {
+                return restApi.authorize().then(function() {
+                  return restApi.getToken();
+                });
+              } else {
+                return restApi.getToken();
+              }
+            }).then(function(token) {
+              // Get API key from the Power-Up
+              var apiKey = '48c41741fc71fbb3f79e6645ae1c23ea';
+              
+              // Create the card
+              return fetch('https://api.trello.com/1/cards?key=' + apiKey + '&token=' + token, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  name: cardName,
+                  desc: description,
+                  idList: list.id
+                })
+              })
+              .then(function(response) {
+                if (!response.ok) {
+                  throw new Error('Failed to create card');
+                }
+                return response.json();
+              })
+              .then(function(card) {
+                var promises = [];
+                
+                // Create checklist if there are items
+                if (partItems.length > 0) {
+                  promises.push(
+                    fetch('https://api.trello.com/1/checklists?key=' + apiKey + '&token=' + token, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        idCard: card.id,
+                        name: 'Parts Needed'
+                      })
+                    })
+                    .then(function(response) {
+                      return response.json();
+                    })
+                    .then(function(checklist) {
+                      // Add all checklist items
+                      var itemPromises = partItems.map(function(item) {
+                        return fetch('https://api.trello.com/1/checklists/' + checklist.id + '/checkItems?key=' + apiKey + '&token=' + token, {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ name: item })
+                        });
+                      });
+                      return Promise.all(itemPromises);
+                    })
+                  );
+                }
+                
+                // Add comment if provided
+                if (comments) {
+                  promises.push(
+                    fetch('https://api.trello.com/1/cards/' + card.id + '/actions/comments?key=' + apiKey + '&token=' + token, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ text: comments })
+                    })
+                  );
+                }
+                
+                return Promise.all(promises).then(function() {
+                  return card;
+                });
+              });
+            });
+          });
+        })
+        .then(function(card) {
+          // Success! Close the popup
+          return t.closePopup();
+        })
+        .catch(function(error) {
+          console.error('Error creating card:', error);
+          alert('Error creating card: ' + error.message + '\n\nPlease make sure the Power-Up is authorized.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Create Card';
+        });
+    });
+  </script>
+</body>
+</html>
