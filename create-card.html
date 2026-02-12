@@ -117,37 +117,11 @@
       cursor: not-allowed;
     }
     
-    .btn-authorize {
-      width: 100%;
-      padding: 10px;
-      background: #61bd4f;
-      color: white;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
-    
-    .btn-authorize:hover {
-      background: #5aac44;
-    }
-    
     .error {
       color: #eb5a46;
       font-size: 12px;
       margin-top: 5px;
       display: none;
-    }
-    
-    .auth-notice {
-      background: #fff3cd;
-      border: 1px solid #ffc107;
-      padding: 10px;
-      border-radius: 3px;
-      margin-bottom: 15px;
-      font-size: 13px;
     }
     
     .success-notice {
@@ -162,15 +136,9 @@
   </style>
 </head>
 <body>
-  <div id="authNotice" class="auth-notice">
-    ⚠️ First time? Click "Authorize Power-Up" below to enable card creation.
-  </div>
-  
   <div id="successNotice" class="success-notice">
     ✓ Authorized! You can now create cards.
   </div>
-  
-  <button type="button" class="btn-authorize" id="authorizeBtn">Authorize Power-Up</button>
   
   <form id="cardForm">
     <div class="form-group">
@@ -224,9 +192,7 @@
     var API_KEY = '57c447d193fc650177b14923e1ba4daf';
     var USER_TOKEN = 'ATTA0f6ea16dcb511f7e1b9043ff00930dabe4b757b957a7246d114519846c70568f45DD8295';
     
-    // Hide authorization UI since we have the token
-    document.getElementById('authNotice').style.display = 'none';
-    document.getElementById('authorizeBtn').style.display = 'none';
+    // Show success message
     document.getElementById('successNotice').style.display = 'block';
     
     function addChecklistItem() {
@@ -245,56 +211,6 @@
       if (items.length > 1) {
         button.parentElement.remove();
       }
-    }
-    
-    // Check if already authorized
-    t.get('member', 'private', 'token').then(function(token) {
-      if (token) {
-        document.getElementById('authNotice').style.display = 'none';
-        document.getElementById('successNotice').style.display = 'block';
-        document.getElementById('authorizeBtn').textContent = 'Re-authorize';
-      }
-    });
-    
-    // Authorization button
-    document.getElementById('authorizeBtn').addEventListener('click', function() {
-      var authUrl = 'https://trello.com/1/authorize?' +
-        'expiration=never&' +
-        'name=Parts%20Sales%20Logger&' +
-        'scope=read,write&' +
-        'response_type=token&' +
-        'key=' + API_KEY +
-        '&return_url=' + encodeURIComponent(window.location.href);
-      
-      // Open in same window
-      window.location.href = authUrl;
-    });
-    
-    // Listen for token from authorization
-    window.addEventListener('message', function(event) {
-      if (event.origin !== 'https://trello.com') return;
-      
-      if (event.data && event.data.token) {
-        t.set('member', 'private', 'token', event.data.token).then(function() {
-          document.getElementById('authNotice').style.display = 'none';
-          document.getElementById('successNotice').style.display = 'block';
-          document.getElementById('authorizeBtn').textContent = 'Re-authorize';
-          alert('Authorization successful! You can now create cards.');
-        });
-      }
-    });
-    
-    // Check URL for token (from return_url)
-    var urlParams = new URLSearchParams(window.location.hash.substring(1));
-    var token = urlParams.get('token');
-    if (token) {
-      t.set('member', 'private', 'token', token).then(function() {
-        document.getElementById('authNotice').style.display = 'none';
-        document.getElementById('successNotice').style.display = 'block';
-        document.getElementById('authorizeBtn').textContent = 'Re-authorize';
-        // Clean up URL
-        window.location.hash = '';
-      });
     }
     
     document.getElementById('cardForm').addEventListener('submit', function(e) {
@@ -426,7 +342,6 @@
                 });
               });
             });
-        });
       })
       .then(function(card) {
         // Success!
