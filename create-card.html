@@ -254,17 +254,14 @@
     document.getElementById('authorizeBtn').addEventListener('click', function() {
       var authUrl = 'https://trello.com/1/authorize?' +
         'expiration=never&' +
-        'name=Parts Sales Logger&' +
+        'name=Parts%20Sales%20Logger&' +
         'scope=read,write&' +
         'response_type=token&' +
         'key=' + API_KEY +
         '&return_url=' + encodeURIComponent(window.location.href);
       
-      t.popup({
-        title: 'Authorize Trello',
-        url: authUrl,
-        height: 680
-      });
+      // Open in same window
+      window.location.href = authUrl;
     });
     
     // Listen for token from authorization
