@@ -2,12 +2,11 @@
   "name": "Parts Sales Logger",
   "details": "Quick card creation for parts sales tracking",
   "icon": {
-    "url": "./icon.svg"
+    "url": "https://travis-parts.github.io/Part-Sales-Logger/icon.svg"
   },
-  "author": "Your Dealership",
+  "author": "Travis Zimmerman",
   "capabilities": [
     "board-buttons"
   ],
-  "connectorName": "Parts Sales Logger",
-  "tags": ["sales", "parts", "tracking"]
+  "connectorName": "Parts Sales Logger"
 }
