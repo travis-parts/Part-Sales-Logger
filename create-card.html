@@ -174,7 +174,10 @@
   </form>
 
   <script>
-    var t = TrelloPowerUp.iframe();
+    var t = TrelloPowerUp.iframe({
+      appKey: '48c41741fc71fbb3f79e6645ae1c23ea',
+      appName: 'Parts Sales Logger'
+    });
     var Promise = TrelloPowerUp.Promise;
     
     // Check authorization on load
